@@ -3,6 +3,8 @@ package com.teosantos.course.services;
 import java.util.List;
 import java.util.Optional;
 
+import javax.persistence.EntityNotFoundException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -46,9 +48,14 @@ public class UserService {
 	}
 	
 	public User update(Long id, User user) {
-		User obj = userRepository.getOne(id);
-		update(obj, user);
-		return userRepository.save(obj);
+		try {
+			User obj = userRepository.getOne(id);
+			update(obj, user);
+			return userRepository.save(obj);
+		}
+		catch (EntityNotFoundException e) {
+			throw new ResourceNotFoundException(id);
+		}
 	}
 
 	private void update(User obj, User user) {
